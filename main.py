@@ -47,15 +47,15 @@ def phase_2():
     train_df = pd.read_csv('BT2024176_train_var2.csv')
     test_df = pd.read_csv('BT2024176_test_var2.csv')
     
-    # We found via CV that using all 3 features and degree 8 gives optimal validation R2
+    # We found via CV that using all 3 features and degree 7 gives optimal validation R2
     features = ['x1', 'x2', 'x3']
     target = 'y'
     
     X_train = train_df[features]
     y_train = train_df[target]
     
-    # Polynomial features degree 8
-    poly = PolynomialFeatures(degree=8, include_bias=False)
+    # Polynomial features degree 7
+    poly = PolynomialFeatures(degree=7, include_bias=False)
     X_train_poly = poly.fit_transform(X_train)
     
     # Train model
