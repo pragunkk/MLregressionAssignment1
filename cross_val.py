@@ -51,7 +51,7 @@ def find_best_model(df, max_features, max_degree, prefix):
     return best_config
 
 print("--- Phase 1 ---")
-best_p1 = find_best_model(train_df_1, 6, 6, "Var1")
+best_p1 = find_best_model(train_df_1, 6, 10, "Var1")
 
 print("--- Phase 2 ---")
-best_p2 = find_best_model(train_df_2, 3, 10, "Var2")
+best_p2 = find_best_model(train_df_2, 3, 20, "Var2")
