@@ -48,6 +48,8 @@ To further improve performance and prevent overfitting at higher degrees, I also
 - **OLS Best**: Degree 4 (Val R² = 0.9149)
 - **Ridge Best**: Applying Ridge regression ($\alpha \approx 11.2884$) allowed the model to safely utilize **Degree 5** polynomial features without overfitting, improving the peak validation R² score to **0.9458**.
 
+![Var1 Metrics vs Polynomial Degree (Ridge Regularized)](var1_metrics_reg.png)
+
 **Conclusion for Phase 1:** I decided the optimal model is a **Ridge Regularized Polynomial model of Degree 5 using all 6 features**, as it yields superior generalization.
 
 ---
@@ -95,6 +97,8 @@ Based on the table and the graph, I observed the following:
 To stabilize the higher-degree models and extract better performance, I implemented Ridge Regression with Standard Scaling.
 - **OLS Best**: Degree 8 (Val R² = 0.9938)
 - **Ridge Best**: With Ridge regularization ($\alpha \approx 1.6238$), the model was able to successfully leverage a higher polynomial of **Degree 10**, pushing the peak validation R² to **0.9941**. Regularization also completely eliminated the catastrophic overfitting seen in degrees 14-20.
+
+![Var2 Metrics vs Polynomial Degree (Ridge Regularized)](var2_metrics_reg.png)
 
 **Conclusion for Phase 2:** I decided the optimal model is a **Ridge Regularized Polynomial model of Degree 10 using all 3 features**, achieving the best overall performance and robustness.
 

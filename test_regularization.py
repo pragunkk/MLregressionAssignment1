@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 from sklearn.preprocessing import PolynomialFeatures, StandardScaler
 from sklearn.linear_model import RidgeCV, LinearRegression
 from sklearn.metrics import mean_squared_error, r2_score
@@ -18,18 +19,17 @@ def evaluate_regularization(df, features, target_col, max_degree, prefix=""):
     best_overall_alpha = None
     
     print(f"--- {prefix} Regularization Test ---")
-    print(f"{'Degree':<10} | {'Best Alpha':<15} | {'Reg Val R2':<15} | {'OLS Val R2':<15}")
+    print(f"{'Degree':<10} | {'Best Alpha':<15} | {'Reg Val MSE':<15} | {'Reg Val R2':<15}")
     print("-" * 65)
     
     X = df[features]
     y = df[target_col]
     
+    mean_reg_mses = []
+    mean_reg_r2s = []
+    
     for deg in degrees:
-        # Cross-validation for OLS (to compare)
-        ols_val_r2s = []
-        # We will do a manual nested-like approach or just use RidgeCV inside manual CV.
-        # It's better to do manual CV and use RidgeCV on the training folds.
-        
+        reg_val_mses = []
         reg_val_r2s = []
         best_alpha_for_deg = []
         
@@ -42,11 +42,6 @@ def evaluate_regularization(df, features, target_col, max_degree, prefix=""):
                 X_train_poly = poly.fit_transform(X_train_fold)
                 X_val_poly = poly.transform(X_val_fold)
                 
-                # OLS
-                model_ols = LinearRegression().fit(X_train_poly, y_train_fold)
-                ols_pred = model_ols.predict(X_val_poly)
-                ols_val_r2s.append(r2_score(y_val_fold, ols_pred))
-                
                 # Ridge
                 scaler = StandardScaler()
                 X_train_poly_scaled = scaler.fit_transform(X_train_poly)
@@ -54,6 +49,8 @@ def evaluate_regularization(df, features, target_col, max_degree, prefix=""):
                 
                 model_ridge = RidgeCV(alphas=alphas, cv=3).fit(X_train_poly_scaled, y_train_fold)
                 ridge_pred = model_ridge.predict(X_val_poly_scaled)
+                
+                reg_val_mses.append(mean_squared_error(y_val_fold, ridge_pred))
                 reg_val_r2s.append(r2_score(y_val_fold, ridge_pred))
                 best_alpha_for_deg.append(model_ridge.alpha_)
                 
@@ -61,20 +58,49 @@ def evaluate_regularization(df, features, target_col, max_degree, prefix=""):
                 pass
                 
         if reg_val_r2s:
+            mean_reg_mse = np.mean(reg_val_mses)
             mean_reg_r2 = np.mean(reg_val_r2s)
-            mean_ols_r2 = np.mean(ols_val_r2s)
             mean_alpha = np.median(best_alpha_for_deg)
+            
+            mean_reg_mses.append(mean_reg_mse)
+            mean_reg_r2s.append(mean_reg_r2)
             
             if mean_reg_r2 > best_overall_r2:
                 best_overall_r2 = mean_reg_r2
                 best_overall_deg = deg
                 best_overall_alpha = mean_alpha
                 
-            print(f"{deg:<10} | {mean_alpha:<15.4f} | {mean_reg_r2:<15.4f} | {mean_ols_r2:<15.4f}")
+            print(f"{deg:<10} | {mean_alpha:<15.4f} | {mean_reg_mse:<15.4f} | {mean_reg_r2:<15.4f}")
         else:
             print(f"{deg:<10} | {'N/A':<15} | {'N/A':<15} | {'N/A':<15}")
+            mean_reg_mses.append(np.nan)
+            mean_reg_r2s.append(np.nan)
             
     print(f"\nBest Config for {prefix}: Degree {best_overall_deg}, Alpha ~ {best_overall_alpha:.4f} (Val R2: {best_overall_r2:.4f})\n")
+    
+    # Plotting Regularization Metrics (MSE and R2)
+    plot_mses = np.clip(mean_reg_mses, a_min=0, a_max=np.nanmedian(mean_reg_mses) * 10)
+    plot_r2s = np.clip(mean_reg_r2s, a_min=-1.0, a_max=1.0)
+    
+    fig, ax1 = plt.subplots(figsize=(10, 6))
+    
+    color = 'tab:red'
+    ax1.set_xlabel('Polynomial Degree')
+    ax1.set_ylabel('Mean Squared Error (MSE)', color=color)
+    ax1.plot(degrees, plot_mses, marker='o', color=color, label='Regularized MSE')
+    ax1.tick_params(axis='y', labelcolor=color)
+    
+    ax2 = ax1.twinx()
+    color = 'tab:blue'
+    ax2.set_ylabel('R² Score', color=color)
+    ax2.plot(degrees, plot_r2s, marker='s', color=color, label='Regularized R² Score')
+    ax2.tick_params(axis='y', labelcolor=color)
+
+    fig.suptitle(f'{prefix}: Regularized Validation Metrics vs Polynomial Degree')
+    fig.tight_layout()
+    
+    plt.savefig(f'{prefix.lower()}_metrics_reg.png', dpi=300)
+    plt.close()
 
 def main():
     train_df_1 = pd.read_csv('BT2024176_train_var1.csv')
