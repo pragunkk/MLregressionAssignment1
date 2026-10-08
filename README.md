@@ -1,8 +1,8 @@
 # Polynomial Regression Assignment Report
 
-**Name:** Pragun K Kirani
-**Roll Number:** BT2024176
-**Github** [https://github.com/pragunkk/MLregressionAssignment1](https://github.com/pragunkk/MLregressionAssignment1)
+- **Name:** Pragun K Kirani
+- **Roll Number:** BT2024176
+- **Github** [https://github.com/pragunkk/MLregressionAssignment1](https://github.com/pragunkk/MLregressionAssignment1)
 
 ## Introduction
 In this assignment, I built polynomial regression models for two distinct phases of a multi-stage geothermal power plant expansion project. Each phase presented unique challenges and required me to build a separate model to predict the target variable `y` given a set of features. My primary objective was to obtain accurate predictions on the provided test datasets by figuring out the optimal polynomial degree and selecting the appropriate features. 
