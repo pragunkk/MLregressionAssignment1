@@ -43,7 +43,12 @@ Based on the table and the graph, I observed the following:
 2. **Optimal Fit at Degree 4:** As the degree increased, MSE decreased and R² improved, peaking at **Degree 4** (MSE = 0.7940, R² = 0.9149).
 3. **Overfitting at High Degrees:** Beyond degree 4, the validation MSE sharply increased, and the R² score dropped drastically, entering severe negative values at degree 6. This was a classic indication of the model overfitting to noise in the training set and failing to generalize. Although the metrics stabilized somewhat after degree 6, they never approached the performance of degree 4.
 
-**Conclusion for Phase 1:** I decided the optimal model is a **Polynomial Regression model of Degree 4 using all 6 features**.
+### Regularization Testing (Ridge)
+To further improve performance and prevent overfitting at higher degrees, I also tested Ridge Regularization combined with Standard Scaling across all degrees. 
+- **OLS Best**: Degree 4 (Val R² = 0.9149)
+- **Ridge Best**: Applying Ridge regression ($\alpha \approx 11.2884$) allowed the model to safely utilize **Degree 5** polynomial features without overfitting, improving the peak validation R² score to **0.9458**.
+
+**Conclusion for Phase 1:** I decided the optimal model is a **Ridge Regularized Polynomial model of Degree 5 using all 6 features**, as it yields superior generalization.
 
 ---
 
@@ -83,7 +88,20 @@ Using all 3 spatial features, I evaluated models from degree 1 through 20 using 
 ### Model Selection and Rationale
 Based on the table and the graph, I observed the following:
 1. **Steady Improvement:** Unlike Phase 1, the Phase 2 data exhibited significantly higher complexity. As the polynomial degree increased from 1 to 8, the MSE continuously dropped and the R² score steadily improved.
-2. **Optimal Fit at Degree 8:** My model achieved peak validation performance at **Degree 8** (MSE = 0.2854, R² = 0.9938).
+2. **Optimal Fit at Degree 8:** My unregularized OLS model achieved peak validation performance at **Degree 8** (MSE = 0.2854, R² = 0.9938).
 3. **Catastrophic Overfitting:** Starting from degree 9, performance slowly declined until degree 13 (R² = 0.5868). At degree 14 and beyond, I observed catastrophic overfitting, with the MSE exploding into the billions and R² scores dropping to massive negative numbers. The curse of dimensionality heavily affected these extremely high-degree polynomial models.
 
-**Conclusion for Phase 2:** I decided the optimal model is a **Polynomial Regression model of Degree 8 using all 3 features**.
+### Regularization Testing (Ridge)
+To stabilize the higher-degree models and extract better performance, I implemented Ridge Regression with Standard Scaling.
+- **OLS Best**: Degree 8 (Val R² = 0.9938)
+- **Ridge Best**: With Ridge regularization ($\alpha \approx 1.6238$), the model was able to successfully leverage a higher polynomial of **Degree 10**, pushing the peak validation R² to **0.9941**. Regularization also completely eliminated the catastrophic overfitting seen in degrees 14-20.
+
+**Conclusion for Phase 2:** I decided the optimal model is a **Ridge Regularized Polynomial model of Degree 10 using all 3 features**, achieving the best overall performance and robustness.
+
+---
+
+## Deliverables Generated
+- **Prediction Files**: 
+  - `BT2024176_pred_var1.csv` (Updated with Degree 5 Ridge predictions)
+  - `BT2024176_pred_var2.csv` (Updated with Degree 10 Ridge predictions)
+- **Codebase**: `main.py` contains the final code using Ridge Regression and Standard Scaler to perform inference. `test_regularization.py` contains the advanced tuning logic.
